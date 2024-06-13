@@ -16,12 +16,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@CPFValidation
 public class AuthorDTO {
 
     private Long id;
 
     @NotBlank(message = "O nome é obrigatório")
     private String name;
+
     private String gender;
 
     @Email(message = "O e-mail deve ser válido")
@@ -35,8 +37,7 @@ public class AuthorDTO {
     @CountryValidation
     private String country;
 
-    @CPFValidation
-    private String CPF;
+    private String cpf;
 
     public AuthorDTO(Author entity){
         id = entity.getId();
@@ -45,6 +46,6 @@ public class AuthorDTO {
         email = entity.getEmail();
         birthdate = entity.getBirthdate();
         country = entity.getCountry();
-        CPF = entity.getCpf();
+        cpf = entity.getCpf();
     }
 }

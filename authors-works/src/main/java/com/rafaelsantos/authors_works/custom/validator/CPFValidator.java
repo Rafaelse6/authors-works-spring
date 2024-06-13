@@ -1,16 +1,16 @@
 package com.rafaelsantos.authors_works.custom.validator;
 
 import com.rafaelsantos.authors_works.custom.CPFValidation;
-import com.rafaelsantos.authors_works.entities.Author;
+import com.rafaelsantos.authors_works.entities.DTO.AuthorDTO;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintValidator;
 
-public class CPFValidator implements ConstraintValidator<CPFValidation, Author> {
+public class CPFValidator implements ConstraintValidator<CPFValidation, AuthorDTO> {
 
     @Override
-    public boolean isValid(Author author, ConstraintValidatorContext context) {
-        if (author.getCountry() != null && author.getCountry().equalsIgnoreCase("Brasil")) {
-            return author.getCpf() != null && isValidCPF(author.getCpf());
+    public boolean isValid(AuthorDTO dto, ConstraintValidatorContext context) {
+        if ("Brasil".equalsIgnoreCase(dto.getCountry())) {
+            return dto.getCpf() != null && isValidCPF(dto.getCpf());
         }
         return true;
     }
