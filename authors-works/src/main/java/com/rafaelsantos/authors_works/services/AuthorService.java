@@ -25,6 +25,10 @@ public class AuthorService {
 
     @Transactional
     public AuthorDTO insert(AuthorDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("AuthorDTO cannot be null");
+        }
+
         if ("Brasil".equalsIgnoreCase(dto.getCountry())) {
             if (dto.getCpf() != null && authorRepository.existsByCpf(dto.getCpf())) {
                 throw new DataIntegrityViolationException("CPF já existe");
