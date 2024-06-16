@@ -23,7 +23,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public Page<WorkDTO> findAllByDescription(String description, Pageable pageable){
-        Page<Work> list = workRepository.searchByName(description, pageable);
+        Page<Work> list = workRepository.searchByDescription(description, pageable);
         return list.map(WorkDTO::new);
     }
 }
