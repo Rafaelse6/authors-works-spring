@@ -1,7 +1,5 @@
 package com.rafaelsantos.authors_works.services;
 
-import com.rafaelsantos.authors_works.entities.Author;
-import com.rafaelsantos.authors_works.entities.DTO.AuthorDTO;
 import com.rafaelsantos.authors_works.entities.DTO.WorkDTO;
 import com.rafaelsantos.authors_works.entities.Work;
 import com.rafaelsantos.authors_works.repositories.WorkRepository;
@@ -27,20 +25,5 @@ public class WorkService {
     public Page<WorkDTO> findAllByDescription(String description, Pageable pageable){
         Page<Work> list = workRepository.searchByName(description, pageable);
         return list.map(WorkDTO::new);
-    }
-
-
-    private void copyDtoToEntity(WorkDTO dto, Work entity){
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setExhibitionDate(dto.getExhibitionDate());
-        entity.setPublicationDate(dto.getPublicationDate());
-
-        entity.getAuthors().clear();
-        for (AuthorDTO authorDTO : dto.getAuthors()){
-            Author author = new Author();
-            author.setId(author.getId());
-            entity.getAuthors().add(author);
-        }
     }
 }

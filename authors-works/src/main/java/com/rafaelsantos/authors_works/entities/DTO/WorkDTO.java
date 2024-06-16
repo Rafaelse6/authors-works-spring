@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -29,7 +30,7 @@ public class WorkDTO {
 
     private LocalDate exhibitionDate;
 
-    private List<AuthorDTO> authors;
+    private List<AuthorDTO> authors = new ArrayList<>();
 
     public WorkDTO(Work entity){
         id = entity.getId();
