@@ -6,6 +6,8 @@ import com.rafaelsantos.authors_works.entities.Work;
 import com.rafaelsantos.authors_works.factories.AuthorFactory;
 import com.rafaelsantos.authors_works.repositories.AuthorRepository;
 import com.rafaelsantos.authors_works.repositories.WorkRepository;
+import com.rafaelsantos.authors_works.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,11 +42,14 @@ public class AuthorServiceTest {
     private Author author;
     private AuthorDTO authorDTO;
     private Work work;
-
+    private long existingAuthorId, nonExistingAuthorId;
     private List<Author> list;
 
     @BeforeEach
     void setUp() throws Exception{
+        existingAuthorId  = 1L;
+        nonExistingAuthorId = 2L;
+
         author = AuthorFactory.createAuthor();
         authorDTO = new AuthorDTO(author);
 
@@ -56,6 +61,11 @@ public class AuthorServiceTest {
 
         Mockito.when(authorRepository.save(any())).thenReturn(author);
         Mockito.when(authorRepository.existsByCpf(anyString())).thenReturn(false);
+
+        Mockito.when(authorRepository.existsById(existingAuthorId)).thenReturn(true);
+        Mockito.when(authorRepository.existsById(nonExistingAuthorId)).thenReturn(false);
+        Mockito.when(authorRepository.getReferenceById(existingAuthorId)).thenReturn(author);
+        Mockito.when(authorRepository.getReferenceById(nonExistingAuthorId)).thenThrow(EntityNotFoundException.class);
     }
 
     @Test
@@ -91,5 +101,35 @@ public class AuthorServiceTest {
     @Test
     public void insertShouldThrowIllegalArgumentExceptionWhenDtoIsNull() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> authorService.insert(null));
+    }
+
+    @Test
+    public void updateShouldReturnAuthorDTOWhenIdExists() {
+        authorDTO.setCpf("123.456.789-00");
+
+        AuthorDTO result = authorService.update(existingAuthorId, authorDTO);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(result.getId(), author.getId());
+        Assertions.assertEquals(result.getName(), author.getName());
+        verify(authorRepository, times(1)).save(any(Author.class));
+    }
+
+    @Test
+    public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> authorService.update(nonExistingAuthorId, authorDTO));
+    }
+
+    @Test
+    public void updateShouldNotCheckCpfIfCountryIsNotBrazil() {
+        authorDTO.setCountry("USA");
+        authorDTO.setCpf(null);
+        Mockito.when(authorRepository.getReferenceById(existingAuthorId)).thenReturn(author);
+
+        AuthorDTO result = authorService.update(existingAuthorId, authorDTO);
+
+        Assertions.assertNotNull(result);
+        verify(authorRepository, times(0)).existsByCpf(anyString());
+        verify(authorRepository, times(1)).save(any(Author.class));
     }
 } 

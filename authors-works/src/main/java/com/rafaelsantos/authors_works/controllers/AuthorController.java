@@ -32,4 +32,10 @@ public class AuthorController {
                 .buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<AuthorDTO> update(@PathVariable Long id, @Valid @RequestBody AuthorDTO dto){
+        dto = authorService.update(id, dto);
+        return ResponseEntity.ok(dto);
+    }
 }
