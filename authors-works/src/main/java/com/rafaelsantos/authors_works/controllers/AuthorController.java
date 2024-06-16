@@ -12,14 +12,14 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value ="/authors")
+@RequestMapping(value = "/authors")
 public class AuthorController {
 
     @Autowired
     private AuthorService authorService;
 
     @GetMapping
-    public ResponseEntity<List<AuthorDTO>> findAll(){
+    public ResponseEntity<List<AuthorDTO>> findAll() {
         List<AuthorDTO> list = authorService.findAll();
         return ResponseEntity.ok(list);
     }
@@ -34,8 +34,14 @@ public class AuthorController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<AuthorDTO> update(@PathVariable Long id, @Valid @RequestBody AuthorDTO dto){
+    public ResponseEntity<AuthorDTO> update(@PathVariable Long id, @Valid @RequestBody AuthorDTO dto) {
         dto = authorService.update(id, dto);
         return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        authorService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

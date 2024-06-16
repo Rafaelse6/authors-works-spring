@@ -3,6 +3,7 @@ package com.rafaelsantos.authors_works.entities.DTO;
 import com.rafaelsantos.authors_works.custom.CPFValidation;
 import com.rafaelsantos.authors_works.custom.CountryValidation;
 import com.rafaelsantos.authors_works.entities.Author;
+import com.rafaelsantos.authors_works.entities.Work;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor

@@ -3,10 +3,12 @@ package com.rafaelsantos.authors_works.services;
 import com.rafaelsantos.authors_works.entities.Author;
 import com.rafaelsantos.authors_works.entities.DTO.AuthorDTO;
 import com.rafaelsantos.authors_works.repositories.AuthorRepository;
+import com.rafaelsantos.authors_works.services.exceptions.DatabaseException;
 import com.rafaelsantos.authors_works.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -50,6 +52,19 @@ public class AuthorService {
             return new AuthorDTO(entity);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("Resource not found");
+        }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void delete(Long id) {
+        if (!authorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+
+        try {
+            authorRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Data integrity violation exception");
         }
     }
 

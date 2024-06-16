@@ -6,6 +6,7 @@ import com.rafaelsantos.authors_works.entities.Work;
 import com.rafaelsantos.authors_works.factories.AuthorFactory;
 import com.rafaelsantos.authors_works.repositories.AuthorRepository;
 import com.rafaelsantos.authors_works.repositories.WorkRepository;
+import com.rafaelsantos.authors_works.services.exceptions.DatabaseException;
 import com.rafaelsantos.authors_works.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -42,13 +43,14 @@ public class AuthorServiceTest {
     private Author author;
     private AuthorDTO authorDTO;
     private Work work;
-    private long existingAuthorId, nonExistingAuthorId;
+    private long existingAuthorId, nonExistingAuthorId, dependentAuthorId;
     private List<Author> list;
 
     @BeforeEach
     void setUp() throws Exception{
         existingAuthorId  = 1L;
         nonExistingAuthorId = 2L;
+        dependentAuthorId = 3L;
 
         author = AuthorFactory.createAuthor();
         authorDTO = new AuthorDTO(author);
@@ -63,9 +65,12 @@ public class AuthorServiceTest {
         Mockito.when(authorRepository.existsByCpf(anyString())).thenReturn(false);
 
         Mockito.when(authorRepository.existsById(existingAuthorId)).thenReturn(true);
+        Mockito.when(authorRepository.existsById(dependentAuthorId)).thenReturn(true);
         Mockito.when(authorRepository.existsById(nonExistingAuthorId)).thenReturn(false);
         Mockito.when(authorRepository.getReferenceById(existingAuthorId)).thenReturn(author);
         Mockito.when(authorRepository.getReferenceById(nonExistingAuthorId)).thenThrow(EntityNotFoundException.class);
+        Mockito.doNothing().when(authorRepository).deleteById(existingAuthorId);
+        Mockito.doThrow(DataIntegrityViolationException.class).when(authorRepository).deleteById(dependentAuthorId);
     }
 
     @Test
@@ -131,5 +136,20 @@ public class AuthorServiceTest {
         Assertions.assertNotNull(result);
         verify(authorRepository, times(0)).existsByCpf(anyString());
         verify(authorRepository, times(1)).save(any(Author.class));
+    }
+
+    @Test
+    public void deleteShouldDoNothingWhenIdExists(){
+        Assertions.assertDoesNotThrow(() -> authorService.delete(existingAuthorId));
+    }
+
+    @Test
+    public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist(){
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> authorService.delete(nonExistingAuthorId));
+    }
+
+    @Test
+    public void deleteShouldThrowDatabaseExceptionWhenIdDoesNotExist(){
+        Assertions.assertThrows(DatabaseException.class, () -> authorService.delete(dependentAuthorId));
     }
 } 
