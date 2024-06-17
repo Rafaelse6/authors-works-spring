@@ -1,7 +1,7 @@
 <h1> Authors/Works API </h1>
 
 > Status: completed ✔️
-### Rest API implementation using Java
+### Rest API implementation using Java with focus on custom searchs and validators
 ## Technologies used:
 
 <table>
